@@ -79,3 +79,23 @@ EMBED_MEAN = -.0017837381
 EMBED_STD = .057699453      
 def get_random_embedding():
     return np.random.normal(loc=EMBED_MEAN, scale=EMBED_STD, size=EMBED_SIZE)
+    
+    
+"""
+Input: tokenizer word index
+Output: list of shape (input_dim, output_dim) = (vocab_size, embedding_size)
+"""
+def get_initial_embeddings(word_index):
+    model = get_simple_model()
+    initial_embedding = []
+    skipped_words = []
+    for word, index in sorted(word_index.items(), key=lambda x: x[1]):
+        try:
+            embedding = model[word]
+        except KeyError:
+            skipped_words.append(word)
+            embedding = get_random_embedding()
+        initial_embedding.append(embedding)
+    print '%d words received random embeddings because previously unseen' % len(skipped_words)
+    return np.array(initial_embedding)
+    
